@@ -1,0 +1,28 @@
+{
+  "name": "Liebre",
+  "description": "Extensión de Chrome que permite resumir, buscar información y generar código basado en el contenido de una web.",
+  "version": "1.0",
+  "manifest_version": 3,
+  "action": {
+    "default_popup": "./src/index.html",
+    "default_icon": "./media/Liebre1.2.svg"
+  },
+  "permissions": [
+    "scripting", 
+    "storage", 
+    "identity", 
+    "notifications", 
+    "activeTab", 
+    "tabs"
+  ],
+  "host_permissions": ["<all_urls>"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"]
+    }
+  ]
+}
