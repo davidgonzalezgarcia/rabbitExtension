@@ -1,0 +1,56 @@
+Formulación inorgánica
+La formulación inorgánica es la parte de la química que se encarga de nombrar y escribir correctamente las fórmulas de los compuestos inorgánicos, es decir, aquellos que no contienen carbono-hidrógeno como estructura principal (aunque hay excepciones).
+
+Clasificación general de los compuestos inorgánicos:
+Óxidos
+
+Óxidos metálicos: metal + oxígeno → M₂On
+Ej: Na₂O (óxido de sodio)
+
+Óxidos no metálicos (anhídridos): no metal + oxígeno → XOn
+Ej: CO₂ (dióxido de carbono)
+
+Hidruros
+
+Hidruros metálicos: metal + hidrógeno → MHₙ
+Ej: NaH (hidruro de sodio)
+
+Hidruros no metálicos: no metal + hidrógeno → HnX
+Ej: PH₃ (fosfina)
+
+Hidróxidos
+
+Metal + OH⁻ → M(OH)n
+Ej: Ca(OH)₂ (hidróxido de calcio)
+
+Ácidos
+
+Hidrácidos: hidrógeno + no metal (grupo 17 o 16) → HX
+Ej: HCl (ácido clorhídrico)
+
+Oxiácidos: hidrógeno + no metal + oxígeno → HnXOm
+Ej: H₂SO₄ (ácido sulfúrico)
+
+Sales
+
+Sales binarias: metal + no metal → MX
+Ej: NaCl (cloruro de sodio)
+
+Oxisales: metal + grupo oxoaniónico → Mx(XOₙ)y
+Ej: Na₂SO₄ (sulfato de sodio)
+
+Nomenclaturas principales:
+Tradicional: usa sufijos y prefijos (hídrico, oso, ico) según el número de oxidación.
+
+Stock: indica el número de oxidación con números romanos entre paréntesis.
+
+Sistemática: indica la cantidad exacta de átomos con prefijos griegos (mono-, di-, tri-, etc.).
+
+Ejemplo:
+FeCl₂
+
+Tradicional: cloruro ferroso
+
+Stock: cloruro de hierro (II)
+
+Sistemática: dicloruro de hierro

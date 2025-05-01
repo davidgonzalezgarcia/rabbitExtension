@@ -1,0 +1,37 @@
+// Función para hacer el login
+async function loginUser(email, password) {
+    try {
+        const response = await fetch('http://tudominio.com/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ email, password }),
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            console.log("Inicio de sesión exitoso:", data.message);
+            console.log("Últimas consultas:", data.consultas);
+
+            // Aquí puedes procesar las consultas y mostrarlas en la UI
+            mostrarConsultas(data.consultas);
+
+        } else {
+            const error = await response.text();
+            console.error("Error al iniciar sesión:", error);
+        }
+    } catch (error) {
+        console.error("Error en la solicitud:", error);
+    }
+}
+
+// Función para mostrar las consultas en la UI
+function mostrarConsultas(consultas) {
+    const listaConsultas = document.getElementById('lista-consultas');
+    consultas.forEach(consulta => {
+        const li = document.createElement('li');
+        li.textContent = `Consulta #${consulta.id}: ${consulta.descripcion} - Fecha: ${consulta.fecha}`;
+        listaConsultas.appendChild(li);
+    });
+}

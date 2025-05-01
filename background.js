@@ -17,7 +17,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.action == "resume") {
     // Realizar una solicitud al servidor para obtener un resumen del contenido
     fetch(`${SERVER_URL}/resume`, {
-        method: "POST", 
+        method: "GET", 
         headers: {
             "Content-Type": "application/json"
         },
@@ -40,7 +40,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.action == "search") {
     // Realizar una búsqueda en el servidor
     fetch(`${SERVER_URL}/search`, {
-        method: "POST", 
+        method: "GET", 
         headers: {
             "Content-Type": "application/json"
         },
@@ -64,11 +64,12 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.action == "generate") {
     // Realizar una solicitud para generar contenido o realizar alguna acción
     fetch(`${SERVER_URL}/generate`, {
-        method: "POST", 
+        method: "GET", 
         headers: {
             "Content-Type": "application/json"
         },
-        body: JSON.stringify({ text: contenidoWeb }) // Enviamos el contenido web para generar algo
+        body: JSON.stringify({ text: contenidoWeb,
+                       prompt: content  }) // Enviamos el contenido web para generar algo
     })
     .then(response => response.json())
     .then(data => {
