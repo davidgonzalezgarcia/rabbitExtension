@@ -1,0 +1,224 @@
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@100..800&display=swap');
+
+:root {
+  --bg: #F5F0DE;
+  --white: #fbb06e;
+  --primary: #ffffff;
+  --dibujos: #df7a27;
+  --light-gray: #e0e0e0;
+  --border-radius: 0.75rem;
+  --shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  --font: 'Sora', sans-serif;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 360px;
+  height: 600px;
+  font-family: var(--font);
+  background-color: var(--bg);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  
+  background-image: url("fondo.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+
+}
+
+/* ========== HEADER ========== */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--white);
+  padding: 0.75rem;
+  box-shadow: var(--shadow);
+  border-bottom: 1px solid #ccc;
+  flex-shrink: 0;
+}
+
+.header > div {
+  flex: 1;
+  height: 40px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+/* Replace with your own icons if needed */
+#web {
+  background-image: url('media/home.svg');
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  scale: 2.2;
+  transition: ease-in-out 0.3s;
+}
+
+#web:hover {
+  scale: 2.5;
+  cursor: pointer;
+}
+
+#logo {
+  background-image: url('media/rabbitLogo.svg');
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  scale: 1.9;
+}
+#profile {
+  background-image: url('media/profilePicture.svg');
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  scale: 2;
+  transition: ease-in-out 0.3s;
+}
+
+#profile:hover {
+  scale: 2.2;
+  cursor: pointer;
+}
+
+/* ========== MAIN CHAT ========== */
+main {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1rem;
+
+}
+
+.chat {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.userInput, .output {
+  padding: 0.75rem 1rem;
+  border-radius: var(--border-radius);
+  background: var(--white);
+  box-shadow: var(--shadow);
+  max-width: 80%;
+  word-wrap: break-word;
+}
+
+.userInput {
+  align-self: flex-end;
+  background-color: rgba(246, 145, 104, 0.89);
+}
+
+.output {
+  align-self: flex-start;
+  background-color: rgba(244, 244, 244, 0.89);
+}
+
+/* ========== LOGIC: Input & Menu ========== */
+.logic {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  border-top: 1px solid #ccc;
+  background-color: var(--white);
+  flex-shrink: 0;
+  position: relative;
+}
+
+/* Prompt Input */
+#prompt {
+  flex: 1;
+  background-color: var(--bg);
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--border-radius);
+  border: 1px solid var(--light-gray);
+  font-size: 0.9rem;
+}
+
+/* Send Button */
+.send {
+  width: 2.5rem;
+  height: 2.5rem;
+  background-color: var(--bg);
+  border-radius: 50%;
+  background-image: url('media/arrow.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 90%;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+  transition: ease-in-out 0.5s;
+}
+
+.send:hover {
+  background-color: #f4f4f4;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  scale: 1.1;
+  rotate: -90deg;
+} 
+
+    .menu-container {
+      position: relative;
+    }
+
+    .menu {
+      width: 2.5rem;
+      height: 2.5rem;
+      background-color: var(--bg);
+      font-weight: bold;
+      font-size: 1.2rem;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+
+    .dropdown {
+      position: absolute;
+      bottom: 3rem;
+      left: 0;
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow);
+      flex-direction: column;
+      opacity: 0;
+      transform: translateY(10px);
+      pointer-events: none;
+      transition: opacity 0.3s ease, transform 0.3s ease;
+      z-index: 100;
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    /* ESTA ES LA CLASE QUE ACTIVARÁ LA VISIBILIDAD */
+    .dropdown.show {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+
+    .dropdown ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      border-radius: var(--border-radius);
+    }
+
+    .dropdown li {
+      padding: 10px;
+      cursor: pointer;
+      transition: background-color 0.3s ease, border-color 0.3s ease;
+      background-color: white;
+      border-radius: var(--border-radius);
+    }
+
+    .dropdown li:hover {
+      background-color: var(--white)
+    }
+

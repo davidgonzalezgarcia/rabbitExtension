@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="styles.css">
+        <title>Liebre Extension, powered by AI</title>
+        
+    </head>
+    <body>
+        <header class="header">
+            <div id="web">
+                
+            </div>
+            <div id="logo">
+                
+            </div>
+            <div id="profile">
+                
+            </div>
+        </header>
+        <main>
+            <div id="chat" class="chat">
+                <div class="userInput">Hola Chat</div>
+                <div class="output">Hola Usuario</div>
+            </div>
+        </main>
+        <div class="logic">
+            <div class="menu-container">
+                <div class="menu" id="menu">☰</div>
+                <div class="dropdown" id="dropdownMenu">
+                    <ul>
+                        <li class="menu-item" id="resume">Resumir</li>
+                        <li class="menu-item" id="search">Buscar</li>
+                        <li class="menu-item" id="generate">Generar</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <input type="text" id="prompt" placeholder="Pregunta algo..."/>
+            <div class="send" id="send">
+            </div>
+        </div>
+    </body>
+    <script src="popup.js"></script>
+</html>

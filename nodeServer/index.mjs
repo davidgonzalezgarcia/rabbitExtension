@@ -1,3 +1,8 @@
+/*ALMACEBAR CLAVES */
+import  dotenv  from "dotenv";
+dotenv.config();
+console.log(process.env.DATABASE_INSTANCE);
+
 //Express para levabntar el servidor
 import express from "express";
 import cors from "cors";
@@ -7,20 +12,33 @@ const app = express();
 app.use(express.json()); // Para manejar solicitudes con JSON
 app.use(express.urlencoded({ extended: true })); // Para manejar solicitudes con datos codificados en URL
 app.use(cors()); // Para permitir solicitudes de diferentes dominios
+app.use(express.json({ limit: '5mb' }));
 
 
 //Para encriptar la contraseña y funciones de validacion
 import bccrypt from "bcrypt";
 import { isValidEmail, isValidPassword } from "./syncFunctions.js";
 
+//Servidor SMTP para enviar correos
+import nodemailer from "nodemailer";
+const transponder = nodemailer.createTransport({
+    host: "smtp.gmail.com",
+    port: 465,
+    secure: true,
+    auth: {
+        user: process.env.NODEMAILER_USER,
+        pass: process.env.NODEMAILER_PASS,
+    },
+})
+
 //Manejar BBDD
 import { createConnection } from "mysql2";
 
 const connection = createConnection({
-  host: "localhost",
-  user: "root",
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
   password: "",
-  database: "rabbitProduction",
+  database: process.env.DATABASE_INSTANCE,
 });
 
 connection.connect((error) => {
@@ -34,8 +52,7 @@ connection.connect((error) => {
 
 //Instanciamos la IA
 import { GoogleGenAI } from "@google/genai";
-const APIKEY = "AIzaSyA8E1qy-6S3OFCzsUW2x7RzDRD83GagymI"
-const ai = new GoogleGenAI({ apiKey: APIKEY });
+const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
 const chat = await ai.chats.create({
     model: "gemini-1.5-flash",
@@ -48,7 +65,7 @@ const chat = await ai.chats.create({
                         If the user is searching for specific information, return the most relevant sections.
                         If asked to generate or transform code, use best practices and provide functional examples.
                         If asked for an explanation, provide a structured, content-based response.
-                        Always format your answers clearly.
+                        
                         Avoid irrelevant information; use only what's necessary from the content.
                         Prioritize clarity, accuracy, and helpfulness.
 
@@ -58,13 +75,42 @@ const chat = await ai.chats.create({
     }
   });
 
-//se le pasa el contenido de la web a la IA
-import fs from "node:fs/promises";
-const contenido = await fs.readFile("./content.txt", { encoding: 'utf8' });
+//Web Token para autenticar al usuario
+import jwt from "jsonwebtoken";
 
-await chat.sendMessage({
-    message: "El contenido de la pagina web sobre la que vas a trabajar es el siguiente: " + contenido
-});
+
+/* 
+------------------------
+LOGICA DEL SERVIDOR 
+------------------------    
+
+*/
+
+//VARIABLES DEL USUARIO
+
+
+app.post("/webContent", async (req, res)=>{
+
+    if (!req.body.content) {
+        return res.status(400).send("Contenido no encontrado");
+    } 
+        
+    const content = req.body.content;
+    const url = req.body.url;
+
+    const response = chat.sendMessage({
+        message: "El contenido de la pagina web sobre la que vas a trabajar es el siguiente: " +content,
+    });
+
+    if (response.error) {
+        return res.status(500).send("Error al procesar el contenido");        
+    }
+
+    //Si el usuario está logueado, guardamos el contenido en la base de datos
+    
+
+    res.status(200).send("Contenido recibido y procesado correctamente");
+})
 
 app.post("/", async (req, res)=>{
 
@@ -74,7 +120,7 @@ app.post("/", async (req, res)=>{
     let input = req.body.input
 
     const stream = await chat.sendMessageStream({ message: input })
-
+    
     for await (const chunk of stream){
         res.write(chunk.text);
     }
@@ -83,28 +129,35 @@ app.post("/", async (req, res)=>{
 })
 
 app.get("/resume", async (req, res)=>{
-
-    
+ 
     res.setHeader('Content-Type', 'text/plain; charset=utf-8'); 
     res.setHeader('Transfer-Encoding', 'chunked');
     
-    const stream = await chat.sendMessageStream({ message: "Resume el contenido de la web" })
+    try {
+        const stream = await chat.sendMessageStream({ message: "Resume el contenido de la web" });
+
+
+        for await (const chunk of stream){
+            res.write(chunk.text);
+        }
     
-    for await (const chunk of stream){
-        res.write(chunk.text);
+        res.end();
+        
+    } catch (error) {
+        console.log("Error al resumir el contenido:", error);
+        res.status(500).send("Error al resumir el contenido");
     }
 
-    res.end();
     
 })
 
 
-app.get("/search", async (req, res)=>{
+app.post("/search", async (req, res)=>{
 
     res.setHeader('Content-Type', 'text/plain; charset=utf-8'); 
     res.setHeader('Transfer-Encoding', 'chunked');
 
-    const searchInput = req.query.searchInput;
+    const searchInput = req.body.searchInput;
 
     const stream = chat.sendMessageStream({ message: "Dime todo lo que salga en la web acerca de: "+searchInput })
 
@@ -118,14 +171,14 @@ app.get("/search", async (req, res)=>{
 
 app.get("/generate", async (req, res)=>{
     
-    res.setHeader('Content-Type', 'text/plain; charset=utf-8'); // o text/event-stream si usas SSE
+    res.setHeader('Content-Type', 'text/plain; charset=utf-8');
     res.setHeader('Transfer-Encoding', 'chunked');
 
     const prompt = req.query.prompt;
     const lang = req.query.lang;
 
     const stream = chat.sendMessageStream({ message: "Genera codigo en base al contenido,especificamente,"+ prompt +" en lenguaje "+lang })
-
+    
     for await (const chunk of stream){
         res.write(chunk.text);
     }
@@ -158,8 +211,16 @@ app.post("/login",(req, res)=>{
             return res.status(401).send("Contraseña incorrecta");
         }
 
+        //Generamos el jwt
+        const token = jwt.sign(
+            { id: user.id, email: user.email },
+            process.env.JWT_PASS,
+            { expiresIn: '60d' } 
+        )
+
         res.status(200).json({
             mensaje: "Usuario logueado correctamente",
+            token: token,
             user: {
                 id: user.id,
                 email: user.email,
@@ -172,9 +233,7 @@ app.post("/login",(req, res)=>{
 app.post("/register",(req, res)=>{
         
         const email = req.body.email
-        const password = req.body.password
-        console.log(req.body);
-        
+        const password = req.body.password        
 
         //Comprobamos minimamente el email y la contraseña
         if (!isValidEmail(email)){
@@ -206,11 +265,46 @@ app.post("/register",(req, res)=>{
                         console.error(error);
                         return res.status(500).send("Ha ocurrido un error al registrar el usuario");
                     } else {
-                        res.status(200).send("Usuario registrado")
+                        
+                        //Metemos el JWT
+                        const token = jwt.sign(
+                            { id: resultados.insertId, email: email },
+                            process.env.JWT_PASS,
+                            { expiresIn: '60d' } 
+                        )
+                        
+                        transponder.sendMail({
+                            from: "david10alhama@gmail.com",
+                            to: email,
+                            subject: "Bienvenido a Rabbit AI",
+                            html: `
+                            <html>
+                                <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+                                <h1 style="color:rgb(117, 56, 204);">¡Bienvenido a Rabbit AI!</h1>
+                                <p>Hola,${email}</p>
+                                <p>Gracias por registrarte en Rabbit AI. Estamos emocionados de tenerte a bordo.</p>
+                                <p>Con Rabbit AI, tendrás acceso a herramientas avanzadas que te ayudarán a aprovechar al máximo la inteligencia artificial.
+                                Si tienes duda o quieres conocer como funciona Rabbit AI en profundidad visita <a href="rabbit.com">Nuestra web </a></p>
+                                <p>¡Esperamos que disfrutes de la experiencia!</p>
+                                <br>
+                                <p>Saludos</p>
+                                <p>El equipo de Rabbit AI :)</p>
+                                </body>
+                            </html>
+                            `
+                        })
+                        
+                        res.status(200).json({
+                            mensaje: "Usuario registrado correctamente",
+                            token: token,
+                            user: {
+                                id: resultados.insertId,
+                                email: email,
+                            },
+                        })
                     }
-
+                    
                 })
-
             }
 
         })
